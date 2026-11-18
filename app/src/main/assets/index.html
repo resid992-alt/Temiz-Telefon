@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="az"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Təmiz Telefon</title>
+<style>
+:root{--bg:#0f1420;--card:#182033;--tx:#e8edf7;--mut:#8b97b3;--ac:#3dd6a3;--wr:#ffb84d;--er:#ff6b6b;--bd:#26304a;--chip:#111829}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:14.5px/1.45 system-ui,sans-serif;padding:16px 0 84px}
+header{padding:8px 16px 4px;display:flex;justify-content:space-between;align-items:center}
+h1{margin:0;font-size:21px;letter-spacing:-.2px}
+.badge{font-size:11.5px;background:#173d38;color:var(--ac);padding:3px 9px;border-radius:99px;font-weight:600}
+main{padding:4px 14px}section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:10px 0}
+.card h3{margin:0 0 8px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,input,select{font:inherit;color:var(--tx)}
+button{background:var(--ac);color:#06241a;border:0;border-radius:10px;padding:9px 13px;font-weight:600;cursor:pointer}
+button.s{background:#26304a;color:var(--tx)}button.d{background:var(--er);color:#fff}button.m{padding:6px 10px;font-size:12.5px}
+button.wl{background:#2b2618;color:var(--wr);border:1px solid #594a22}
+input,select{background:var(--chip);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;min-width:0}
+.bar{height:10px;border-radius:6px;background:var(--chip);overflow:hidden;margin:6px 0 3px}.bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.bar.wr i{background:var(--wr)}.bar.er i{background:var(--er)}
+.note{color:var(--mut);font-size:12.5px}.warn{color:var(--wr)}.red{color:var(--er)}.ok{color:var(--ac)}
+.li{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd)}.li:last-child{border:0}
+.app-l{display:flex;gap:10px;align-items:center;min-width:0;flex:1}
+.app-ic{width:38px;height:38px;border-radius:10px;background:var(--chip);flex-shrink:0;object-fit:cover}
+.app-tx{min-width:0;flex:1}.app-nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pills{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}.pills::-webkit-scrollbar{display:none}
+.pill{background:var(--chip);border:1px solid var(--bd);color:var(--mut);padding:6px 11px;border-radius:99px;font-size:12.5px;white-space:nowrap}
+.pill.on{background:#173d38;border-color:var(--ac);color:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.th{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;background:var(--chip);border:2px solid transparent}
+.th img{width:100%;height:100%;object-fit:cover}.th.sel{border-color:var(--er)}
+.th small{position:absolute;left:0;right:0;bottom:0;background:#000b;font-size:10px;padding:2px 4px;display:flex;justify-content:space-between}
+.th .chk{position:absolute;top:4px;right:4px;background:#0009;border:1.5px solid #fff;border-radius:50%;width:22px;height:22px;text-align:center;line-height:19px;font-size:13px;color:#fff}
+.th.sel .chk{background:var(--er);border-color:var(--er)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.stat-box{background:var(--chip);border:1px solid var(--bd);border-radius:10px;padding:10px;text-align:center}
+.stat-box b{display:block;font-size:16px;color:var(--ac)}.stat-box span{font-size:11.5px;color:var(--mut)}
+.chart{display:flex;align-items:flex-end;gap:4px;height:68px;padding-top:10px;margin-top:6px}
+.chart i{flex:1;background:var(--ac);border-radius:4px 4px 0 0;min-height:4px;opacity:.85}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#0b101a;border-top:1px solid var(--bd);z-index:8}
+nav button{flex:1;background:none;color:var(--mut);border-radius:0;padding:11px 2px;font-size:11.5px}nav button.on{color:var(--ac)}
+#toast{position:fixed;left:14px;right:14px;bottom:88px;background:#26304a;padding:11px 14px;border-radius:10px;display:none;z-index:12;box-shadow:0 6px 20px #0008}
+.sticky-del{position:sticky;bottom:68px;border-color:var(--er);background:#1f1722;z-index:7}
+#lb{position:fixed;inset:0;background:#000e;display:none;flex-direction:column;justify-content:space-between;padding:18px;z-index:20}
+#lb img{max-width:100%;max-height:68vh;object-fit:contain;margin:auto;border-radius:10px}
+</style></head><body>
+
+<header>
+  <h1>🧹 Təmiz Telefon</h1>
+  <span class="badge" id="dev-badge">v2.0 Pro</span>
+</header>
+
+<main>
+<!-- 1. ANA -->
+<section id="p-home" class="on">
+ <div class="card">
+  <h3>Vəziyyət <span class="note" id="bat-mini"></span></h3>
+  <div class="bar" id="rbar"><i id="rb"></i></div><div class="note" id="rt"></div>
+  <div class="bar" id="sbar"><i id="sb"></i></div><div class="note" id="st"></div>
+ </div>
+
+ <div class="card">
+  <h3>Sürətli təmizlik</h3>
+  <div class="row">
+    <button onclick="cleanNow()">⚡ İndi təmizlə</button>
+    <button class="s" onclick="info()">Yenilə</button>
+  </div>
+  <p class="note" style="margin-bottom:0">Arxa plan tətbiqlərini bağlayır (Ağ siyahıdakılar qorunur) və daxili keşi silir.</p>
+ </div>
+
+ <div class="card">
+  <h3>Sürətli alətlər</h3>
+  <div class="row">
+    <button class="s m" onclick="goTab('gal')">🖼 Qalereya analizi</button>
+    <button class="s m" onclick="goTab('fil')">🎬 Böyük videolar</button>
+    <button class="s m" onclick="goTab('app')">📦 Tətbiq keşləri</button>
+    <button class="s m" onclick="N.openStorage()">⚙️ Yaddaş</button>
+  </div>
+ </div>
+
+ <div class="card">
+  <h3>Son 30 günlük nəticə</h3>
+  <div class="stat-grid">
+    <div class="stat-box"><b id="st-mb">0 MB</b><span>Azad RAM</span></div>
+    <div class="stat-box"><b id="st-app">0</b><span>Bağlanan tətbiq</span></div>
+    <div class="stat-box"><b id="st-cnt">0</b><span>Təmizlik sayı</span></div>
+  </div>
+ </div>
+</section>
+
+<!-- 2. TƏTBİQLƏR -->
+<section id="p-app">
+ <div id="perm" class="card" style="display:none">
+  <b class="warn">İstifadə və Keş girişi lazımdır</b>
+  <p class="note">Tətbiqlərin real ölçüsünü, keş həcmini və son istifadə tarixini görmək üçün siyahıdan "Təmiz Telefon"a icazə verin.</p>
+  <button onclick="N.openUsage()">İcazə ver</button>
+ </div>
+
+ <div class="card">
+  <div class="row" style="margin-bottom:8px">
+    <select id="af" onchange="renderApps()" style="flex:1">
+      <option value="size">Ən çox yer tutanlar</option>
+      <option value="cache">Ən çox keş yığanlar</option>
+      <option value="old">30+ gün istifadə olunmayanlar</option>
+      <option value="recent">Son 2 saatda aktiv olanlar</option>
+      <option value="wl">Qorunanlar (Ağ siyahı)</option>
+      <option value="all">Hamısı</option>
+    </select>
+    <button class="s m" onclick="cleanNow()">Bağla</button>
+  </div>
+  <input id="aq" type="search" placeholder="Tətbiq axtar..." oninput="renderApps()" style="width:100%;margin-bottom:6px">
+  <div class="note" id="acnt"></div>
+  <div id="apps"></div>
+ </div>
+</section>
+
+<!-- 3. QALEREYA -->
+<section id="p-gal">
+ <div class="card">
+  <h3>Qalereya analizi <span class="note" id="cache-tag"></span></h3>
+  <div class="row">
+    <select id="lim">
+      <option value="500">Son 500</option>
+      <option value="1500" selected>Son 1500</option>
+      <option value="4000">Son 4000</option>
+      <option value="99999">Hamısı</option>
+    </select>
+    <button onclick="scan(false)">🔍 Analiz et</button>
+    <button class="s m" onclick="clearCache()">Keşi sıfırla</button>
+  </div>
+  <div style="margin-top:8px">
+    <label class="note">Bulanıqlıq həddi: <b id="sens-val">35</b>
+      <input id="sens" type="range" min="5" max="120" value="35" oninput="$('#sens-val').textContent=this.value;renderGal()" style="width:100%;margin-top:4px">
+    </label>
+  </div>
+  <div id="prog" class="note" style="margin-top:4px"></div>
+ </div>
+
+ <div id="gal-cats" class="pills" style="display:none"></div>
+ <div id="res"></div>
+
+ <div class="card sticky-del" id="delbox" style="display:none">
+  <div id="selinfo" style="font-weight:600"></div>
+  <div class="row" style="margin-top:8px">
+    <button class="d" onclick="delSel()">🗑 Seçilənləri sil</button>
+    <button class="s" onclick="sel.clear();renderGal()">Ləğv et</button>
+  </div>
+ </div>
+</section>
+
+<!-- 4. FAYLLAR VƏ VİDEOLAR -->
+<section id="p-fil">
+ <div class="card">
+  <div class="row">
+    <button id="ft-vid" onclick="switchFil('vid')">🎬 Böyük Videolar</button>
+    <button id="ft-doc" class="s" onclick="switchFil('doc')">📦 Böyük Fayllar</button>
+  </div>
+ </div>
+
+ <div id="box-vid" class="card">
+  <h3>Ən böyük videolar <button class="s m" onclick="loadVideos()">Yenilə</button></h3>
+  <p class="note">Yaddaşda ən çox yer tutan videoları seçib birbaşa silə bilərsiniz.</p>
+  <div id="vids"></div>
+ </div>
+
+ <div id="box-doc" class="card" style="display:none">
+  <h3>Böyük fayllar (>5 MB) <button class="s m" onclick="N.openDownloads()">Yükləmələri aç</button></h3>
+  <p class="note">Quraşdırma paketləri (.apk), arxivlər (.zip) və sənədlər.</p>
+  <div id="docs"></div>
+ </div>
+
+ <div class="card sticky-del" id="vdelbox" style="display:none">
+  <div id="vselinfo" style="font-weight:600"></div>
+  <div class="row" style="margin-top:8px">
+    <button class="d" onclick="delVidSel()">🗑 Seçilən videoları sil</button>
+    <button class="s" onclick="vsel.clear();renderVideos()">Ləğv et</button>
+  </div>
+ </div>
+</section>
+
+<!-- 5. SİSTEM VƏ CƏDVƏL -->
+<section id="p-sys">
+ <div class="card">
+  <h3>Batareya və Cihaz Monitoru</h3>
+  <div class="bar" id="bbar"><i id="bb"></i></div>
+  <div class="note" id="bt-main"></div>
+  <div class="stat-grid" style="margin-top:8px">
+    <div class="stat-box"><b id="b-temp">--°C</b><span>Temperatur</span></div>
+    <div class="stat-box"><b id="b-volt">-- V</b><span>Gərginlik</span></div>
+    <div class="stat-box"><b id="b-hlth">--</b><span>Vəziyyət</span></div>
+  </div>
+ </div>
+
+ <div class="card">
+  <h3>Avtomatik təmizlik cədvəli</h3>
+  <div class="row">
+    <label><input type="checkbox" id="son"> Aktiv</label>
+    <input type="time" id="stime" value="03:00">
+    <select id="sdays"><option value="1">Hər gün</option><option value="7">Həftədə 1</option></select>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <label><input type="checkbox" id="snote" checked> Bildiriş göndər</label>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button onclick="saveSch()">Yadda saxla</button>
+    <button class="s m" id="btn-bopt" onclick="N.requestIgnoreBatteryOpt()">Batareya məhdudiyyətini söndür</button>
+  </div>
+  <p class="note" id="bopt-note" style="margin-bottom:0"></p>
+ </div>
+
+ <div class="card">
+  <h3>Təmizlik tarixçəsi (Son 30 əməliyyat)</h3>
+  <div class="chart" id="hchart"></div>
+  <div id="hlist" style="margin-top:8px"></div>
+ </div>
+</section>
+</main>
+
+<!-- FULLSCREEN LIGHTBOX -->
+<div id="lb" onclick="if(event.target===this)closeLb()">
+  <div class="row" style="justify-content:space-between">
+    <span id="lb-title" style="font-weight:600;max-width:75%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <button class="s m" onclick="closeLb()">✕ Bağla</button>
+  </div>
+  <img id="lb-img" src="" alt="">
+  <div class="card" style="margin:0">
+    <div id="lb-meta" class="note" style="margin-bottom:8px"></div>
+    <div class="row">
+      <button id="lb-sel-btn" onclick="toggleLbSel()">Seç</button>
+      <button class="s" onclick="closeLb()">Geri</button>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <button class="on" data-t="home">Ana</button>
+  <button data-t="app">Tətbiqlər</button>
+  <button data-t="gal">Qalereya</button>
+  <button data-t="fil">Fayllar</button>
+  <button data-t="sys">Sistem</button>
+</nav>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),J=s=>JSON.parse(s),N=window.Native||{};
+const fmt=b=>b>=1e9?(b/1e9).toFixed(2)+' GB':b>=1e6?Math.round(b/1e6)+' MB':Math.round(b/1e3)+' KB';
+const fmtDur=ms=>{const s=Math.floor(ms/1000),m=Math.floor(s/60),r=s%60;return m+':'+String(r).padStart(2,'0')};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const tick=()=>new Promise(r=>setTimeout(r,0));
+
+function toast(m){
+  const t=$('#toast');t.textContent=m;t.style.display='block';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3800);
+}
+
+function goTab(tab){
+  document.querySelectorAll('nav button,section').forEach(e=>e.classList.remove('on'));
+  const btn=document.querySelector(`nav button[data-t="${tab}"]`);
+  if(btn)btn.classList.add('on');
+  $('#p-'+tab).classList.add('on');
+  if(tab==='app')loadApps();
+  if(tab==='fil')loadVideos();
+  if(tab==='sys'){loadSys();loadHistory();}
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>goTab(b.dataset.t));
+
+function info(){
+  try{
+    const r=J(N.ram()),s=J(N.storage()),ru=r.t-r.a,su=s.t-s.f;
+    const rp=ru/r.t*100,sp=su/s.t*100;
+    $('#rb').style.width=rp+'%';
+    $('#rbar').className='bar'+(rp>85?' er':rp>70?' wr':'');
+    $('#rt').textContent=`RAM: ${fmt(ru)} istifadədə / ${fmt(r.t)}`;
+    $('#sb').style.width=sp+'%';
+    $('#sbar').className='bar'+(sp>88?' er':sp>75?' wr':'');
+    $('#st').textContent=`Yaddaş: ${fmt(su)} dolu / ${fmt(s.t)} (boş: ${fmt(s.f)})`;
+    const sys=J(N.sysInfo());
+    $('#bat-mini').textContent=`🔋 ${sys.bp}% · ${sys.bt}°C`;
+    $('#dev-badge').textContent=sys.dev;
+  }catch(e){}
+  loadHistory();
+}
+
+function cleanNow(){
+  toast('Təmizlənir…');
+  setTimeout(()=>{
+    const r=J(N.kill());
+    const wlMsg=r.s?` (${r.s} qorunan saxlanıldı)`:'';
+    toast(`${r.n} tətbiq bağlandı · ~${r.mb} MB RAM azad${wlMsg}`);
+    info();
+  },60);
+}
+
+// --- TƏTBİQLƏR + KEŞ + AĞ SİYAHI ---
+let apps=[];
+function loadApps(){
+  $('#perm').style.display=N.hasUsage()?'none':'block';
+  apps=J(N.apps());
+  renderApps();
+}
+function toggleAppWl(pkg,idx){
+  const added=N.toggleWl(pkg);
+  apps[idx].wl=added;
+  toast(added?'Ağ siyahıya əlavə edildi (təmizlikdə bağlanmayacaq)':'Ağ siyahıdan çıxarıldı');
+  renderApps();
+}
+function renderApps(){
+  const now=Date.now(),f=$('#af').value,q=($('#aq').value||'').toLowerCase().trim();
+  let a=apps.map((x,idx)=>({...x,_i:idx,d:Math.floor((now-(x.l||x.i))/864e5)}));
+  if(q)a=a.filter(x=>x.n.toLowerCase().includes(q)||x.p.toLowerCase().includes(q));
+  if(f==='size')a.sort((p,q)=>q.sz-p.sz);
+  else if(f==='cache')a.sort((p,q)=>q.ca-p.ca);
+  else if(f==='old'){a=a.filter(x=>x.d>=30).sort((p,q)=>q.d-p.d);}
+  else if(f==='recent'){a=a.filter(x=>x.l&&now-x.l<72e5).sort((p,q)=>q.l-p.l);}
+  else if(f==='wl'){a=a.filter(x=>x.wl);}
+  else a.sort((p,q)=>p.n.localeCompare(q.n));
+
+  $('#acnt').textContent=`${a.length} tətbiq göstərilir`;
+  $('#apps').innerHTML=a.slice(0,200).map(x=>{
+    const szTxt=x.sz?`${fmt(x.sz)} · <span class="warn">Keş: ${fmt(x.ca)}</span>`:(x.l?`${x.d} gün əvvəl`:`${x.d} gün əvvəl quraşdırılıb`);
+    const icHtml=x.ic?`<img class="app-ic" src="data:image/webp;base64,${x.ic}">`:`<div class="app-ic"></div>`;
+    return `<div class="li">
+      <div class="app-l">${icHtml}
+        <div class="app-tx">
+          <div class="app-nm ${x.d>=30&&f==='old'?'red':''}">${esc(x.n)}</div>
+          <div class="note">${szTxt}</div>
+        </div>
+      </div>
+      <div class="row" style="flex-shrink:0">
+        <button class="${x.wl?'wl':'s'} m" onclick="toggleAppWl('${x.p}',${x._i})">${x.wl?'⭐':'☆'}</button>
+        <button class="s m" onclick="N.openApp('${x.p}')">Aç</button>
+        <button class="d m" onclick="N.uninstall('${x.p}')">Sil</button>
+      </div>
+    </div>`;
+  }).join('')||'<p class="note">Uyğun tətbiq tapılmadı.</p>';
+}
+
+// --- INDEXEDDB KEŞİ ---
+function openCacheDB(){
+  return new Promise(res=>{
+    try{
+      const req=indexedDB.open('TemizCacheDB',1);
+      req.onupgradeneeded=e=>e.target.result.createObjectStore('img');
+      req.onsuccess=e=>res(e.target.result);
+      req.onerror=()=>res(null);
+    }catch(e){res(null)}
+  });
+}
+async function getCached(db,key){
+  if(!db)return null;
+  return new Promise(res=>{
+    try{
+      const tx=db.transaction('img','readonly').objectStore('img').get(key);
+      tx.onsuccess=()=>res(tx.result||null);
+      tx.onerror=()=>res(null);
+    }catch(e){res(null)}
+  });
+}
+async function putCached(db,key,val){
+  if(!db)return;
+  try{db.transaction('img','readwrite').objectStore('img').put(val,key)}catch(e){}
+}
+async function clearCache(){
+  try{indexedDB.deleteDatabase('TemizCacheDB');toast('Analiz keşi sıfırlandı')}catch(e){}
+}
+
+// --- QALEREYA ANALİZİ ---
+let items=[],sel=new Set(),activeCat='dup',lbId=null;
+function pc(x){x=x-((x>>1)&0x55555555);x=(x&0x33333333)+((x>>2)&0x33333333);return(((x+(x>>4))&0x0f0f0f0f)*0x01010101)>>24}
+
+async function scan(){
+  if(!N.hasMedia())return toast('Şəkillərə giriş icazəsi verilməyib');
+  items=[];sel.clear();
+  const db=await openCacheDB();
+  const lim=+$('#lim').value,tot=Math.min(N.total(),lim);
+  const c9=document.createElement('canvas');c9.width=9;c9.height=8;const x9=c9.getContext('2d',{willReadFrequently:true});
+  const c96=document.createElement('canvas');c96.width=c96.height=96;const x96=c96.getContext('2d',{willReadFrequently:true});
+  let hits=0;
+
+  for(let o=0;o<tot;o+=40){
+    const page=J(N.images(o,Math.min(40,tot-o)));
+    for(const p of page){
+      const folder=(p.b+' '+p.r).toLowerCase();
+      const isShot=folder.includes('screenshot');
+      const isMsg=folder.includes('whatsapp')||folder.includes('telegram');
+      const it={id:p.id,n:p.n,size:p.s,w:p.w,h:p.h,px:p.w*p.h,b:p.b||p.r||'Qalereya',t:p.t,lap:999,dup:false,hash:null,shot:isShot,msg:isMsg};
+      const cKey=p.id+'_'+p.s;
+      const cached=await getCached(db,cKey);
+      if(cached){
+        it.hash=cached.hash;it.lap=cached.lap;hits++;
+      }else if(p.t){
+        try{
+          const im=new Image();im.src='data:image/jpeg;base64,'+p.t;await im.decode();
+          x9.drawImage(im,0,0,9,8);const g=x9.getImageData(0,0,9,8).data;let a=0,b=0;
+          for(let r=0;r<8;r++)for(let q=0;q<8;q++){
+            const i=(r*9+q)*4,j=i+4,bit=(g[i]+g[i+1]+g[i+2])>(g[j]+g[j+1]+g[j+2])?1:0,k=r*8+q;
+            if(k<32)a|=bit<<k;else b|=bit<<(k-32);
+          }
+          it.hash=[a,b];
+          x96.drawImage(im,0,0,96,96);const d=x96.getImageData(0,0,96,96).data,gr=new Float32Array(9216);
+          for(let k=0;k<9216;k++)gr[k]=.299*d[k*4]+.587*d[k*4+1]+.114*d[k*4+2];
+          let s=0,s2=0,n=0;
+          for(let r=1;r<95;r++)for(let q=1;q<95;q++){
+            const i=r*96+q,l=4*gr[i]-gr[i-1]-gr[i+1]-gr[i-96]-gr[i+96];
+            s+=l;s2+=l*l;n++;
+          }
+          it.lap=Math.sqrt(s2/n-(s/n)**2);
+          putCached(db,cKey,{hash:it.hash,lap:it.lap});
+        }catch(e){}
+      }
+      items.push(it);
+    }
+    $('#prog').textContent=`Analiz: ${items.length} / ${tot}`;
+    await tick();
+  }
+
+  // Dublikatların tapılması (ən böyük həcmli orijinal saxlanılır)
+  const o=[...items].sort((a,b)=>b.size-a.size);
+  for(let i=0;i<o.length;i++){
+    const A=o[i];if(A.dup||!A.hash)continue;
+    for(let j=i+1;j<o.length;j++){
+      const B=o[j];
+      if(!B.dup&&B.hash&&pc(A.hash[0]^B.hash[0])+pc(A.hash[1]^B.hash[1])<=4)B.dup=true;
+    }
+  }
+  $('#cache-tag').textContent=hits?`⚡ ${hits} keşdən`:'';
+  $('#prog').textContent=`Tamamlandı: ${items.length} şəkil analiz edildi.`;
+  renderGal();
+}
+
+function renderGal(){
+  if(!items.length)return;
+  const th=+$('#sens').value;
+  const cat={dup:[],blur:[],shot:[],msg:[],low:[],big:[]};
+  items.forEach(it=>{
+    if(it.dup)cat.dup.push(it);
+    if(it.lap<th)cat.blur.push(it);
+    if(it.shot)cat.shot.push(it);
+    if(it.msg)cat.msg.push(it);
+    if(it.px&&it.px<5e5)cat.low.push(it);
+    if(it.size>10e6)cat.big.push(it);
+  });
+  window._cat=cat;
+  const labels={
+    dup:`Təkrar (${cat.dup.length})`,
+    blur:`Bulanıq (${cat.blur.length})`,
+    shot:`Screenshots (${cat.shot.length})`,
+    msg:`Mesajlaşma (${cat.msg.length})`,
+    low:`Aşağı keyfiyyət (${cat.low.length})`,
+    big:`Böyük >10MB (${cat.big.length})`
+  };
+  const pills=$('#gal-cats');
+  pills.style.display='flex';
+  pills.innerHTML=Object.keys(labels).map(k=>`<button class="pill ${activeCat===k?'on':''}" onclick="activeCat='${k}';renderGal()">${labels[k]}</button>`).join('');
+
+  const list=cat[activeCat]||[];
+  const btnLabel=activeCat==='dup'?'Dublikatları avtomatik seç':'Hamısını seç';
+  $('#res').innerHTML=`<div class="card">
+    <h3>${labels[activeCat]} ${list.length?`<button class="s m" onclick="selCat('${activeCat}')">${btnLabel}</button>`:''}</h3>
+    ${list.length?`<div class="grid">${list.slice(0,180).map(i=>`
+      <div class="th ${sel.has(i.id)?'sel':''}">
+        <img src="data:image/jpeg;base64,${i.t}" onclick="openLb(${i.id})">
+        <div class="chk" onclick="event.stopPropagation();tg(${i.id})">${sel.has(i.id)?'✓':''}</div>
+        <small><span>${fmt(i.size)}</span></small>
+      </div>`).join('')}</div>`:'<p class="note">Bu kateqoriyada şəkil tapılmadı.</p>'}
+  </div>`;
+
+  const s=items.filter(i=>sel.has(i.id)).reduce((a,i)=>a+i.size,0);
+  $('#delbox').style.display=sel.size?'block':'none';
+  $('#selinfo').textContent=`${sel.size} şəkil seçilib · ${fmt(s)} boşalacaq`;
+}
+function tg(id){sel.has(id)?sel.delete(id):sel.add(id);renderGal()}
+function selCat(k){(window._cat[k]||[]).forEach(i=>sel.add(i.id));renderGal()}
+function delSel(){N.del(JSON.stringify([...sel]))}
+window.onDel=ok=>{
+  if(ok){items=items.filter(i=>!sel.has(i.id));toast('Seçilən şəkillər silindi');info();}
+  else toast('Silmə ləğv edildi');
+  sel.clear();renderGal();
+};
+
+// --- TAM EKRAN LIGHTBOX ---
+function openLb(id){
+  const it=items.find(x=>x.id===id);if(!it)return;
+  lbId=id;
+  $('#lb-title').textContent=it.n;
+  $('#lb-meta').textContent=`Ölçü: ${fmt(it.size)} · ${it.w}×${it.h} px · Qovluq: ${it.b}`;
+  $('#lb-img').src='data:image/jpeg;base64,'+it.t;
+  $('#lb-sel-btn').textContent=sel.has(id)?'Seçimi ləğv et':'Silmək üçün seç';
+  $('#lb-sel-btn').className=sel.has(id)?'d':'';
+  $('#lb').style.display='flex';
+  setTimeout(()=>{
+    const hi=N.fullImage(id);
+    if(hi&&lbId===id)$('#lb-img').src='data:image/jpeg;base64,'+hi;
+  },30);
+}
+function closeLb(){lbId=null;$('#lb').style.display='none'}
+function toggleLbSel(){if(lbId!==null){tg(lbId);openLb(lbId)}}
+
+// --- VİDEOLAR VƏ BÖYÜK FAYLLAR ---
+let vids=[],vsel=new Set();
+function switchFil(t){
+  $('#ft-vid').className=t==='vid'?'':'s';
+  $('#ft-doc').className=t==='doc'?'':'s';
+  $('#box-vid').style.display=t==='vid'?'block':'none';
+  $('#box-doc').style.display=t==='doc'?'block':'none';
+  if(t==='vid')loadVideos();else loadDocs();
+}
+function loadVideos(){
+  if(!N.hasVideo()){$('#vids').innerHTML='<p class="note">Videolara giriş icazəsi verilməyib.</p>';return;}
+  vids=J(N.videos(80));
+  renderVideos();
+}
+function renderVideos(){
+  $('#vids').innerHTML=vids.length?`<div class="grid">${vids.map(v=>`
+    <div class="th ${vsel.has(v.id)?'sel':''}" onclick="tgVid(${v.id})">
+      <img src="data:image/jpeg;base64,${v.t}">
+      <div class="chk">${vsel.has(v.id)?'✓':''}</div>
+      <small><span>${fmt(v.s)}</span><span>${fmtDur(v.d)}</span></small>
+    </div>`).join('')}</div>`:'<p class="note">Video tapılmadı.</p>';
+  const tot=vids.filter(v=>vsel.has(v.id)).reduce((a,v)=>a+v.s,0);
+  $('#vdelbox').style.display=vsel.size?'block':'none';
+  $('#vselinfo').textContent=`${vsel.size} video seçilib · ${fmt(tot)} boşalacaq`;
+}
+function tgVid(id){vsel.has(id)?vsel.delete(id):vsel.add(id);renderVideos()}
+function delVidSel(){N.delVideos(JSON.stringify([...vsel]))}
+window.onDelVid=ok=>{
+  if(ok){vids=vids.filter(v=>!vsel.has(v.id));toast('Videolar silindi');info();}
+  else toast('Silmə ləğv edildi');
+  vsel.clear();renderVideos();
+};
+function loadDocs(){
+  const docs=J(N.largeFiles());
+  $('#docs').innerHTML=docs.map(d=>`<div class="li">
+    <div class="app-tx">
+      <div class="app-nm">${esc(d.n)}</div>
+      <div class="note">${fmt(d.s)} · ${esc(d.r||'Daxili yaddaş')}</div>
+    </div>
+    <button class="s m" onclick="N.openDownloads()">Aç</button>
+  </div>`).join('')||'<p class="note">5 MB-dan böyük sənəd və ya arxiv tapılmadı.</p>';
+}
+
+// --- SİSTEM, BATAREYA, CƏDVƏL VƏ TARİXÇƏ ---
+function loadSys(){
+  try{
+    const s=J(N.sysInfo());
+    $('#bb').style.width=s.bp+'%';
+    $('#bbar').className='bar'+(s.bp<20?' er':s.bt>41?' wr':'');
+    $('#bt-main').textContent=`Batareya: ${s.bp}% (${s.bc?'Enerji yığır ⚡':'Batareyada'}) · ${s.dev} (${s.ver})`;
+    $('#b-temp').textContent=s.bt+'°C';
+    $('#b-volt').textContent=s.bv.toFixed(2)+' V';
+    $('#b-hlth').textContent=s.bh;
+    $('#bopt-note').textContent=s.opt
+      ?'✓ Batareya optimallaşdırması söndürülüb — avtomatik təmizlik arxa planda tam gücü ilə işləyəcək.'
+      :'⚠️ Arxa plan cədvəlinin gecikməməsi üçün "Batareya məhdudiyyətini söndür" düyməsinə toxunun.';
+  }catch(e){}
+}
+function loadHistory(){
+  try{
+    const h=J(N.history());
+    const totMb=h.reduce((a,x)=>a+(x.mb||0),0);
+    const totApp=h.reduce((a,x)=>a+(x.n||0),0);
+    $('#st-mb').textContent=totMb>=1024?(totMb/1024).toFixed(1)+' GB':totMb+' MB';
+    $('#st-app').textContent=totApp;
+    $('#st-cnt').textContent=h.length;
+
+    const chart=$('#hchart');
+    const list=$('#hlist');
+    if(!chart||!list)return;
+    if(!h.length){chart.innerHTML='';list.innerHTML='<p class="note">Hələ təmizlik qeydi yoxdur.</p>';return;}
+    const rev=[...h].slice(0,14).reverse();
+    const maxV=Math.max(10,...rev.map(x=>x.mb||1));
+    chart.innerHTML=rev.map(x=>`<i style="height:${Math.max(8,Math.round((x.mb||1)/maxV*100))}%"></i>`).join('');
+    list.innerHTML=h.slice(0,10).map(x=>{
+      const dt=new Date(x.t);
+      const ts=String(dt.getDate()).padStart(2,'0')+'.'+String(dt.getMonth()+1).padStart(2,'0')+' '+String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+      return `<div class="li"><span>${ts} — <b>${x.n}</b> tətbiq bağlandı</span><span class="ok">+${x.mb} MB</span></div>`;
+    }).join('');
+  }catch(e){}
+}
+function saveSch(){
+  const [h,m]=$('#stime').value.split(':').map(Number);
+  N.schedule($('#son').checked,h,m,+$('#sdays').value,$('#snote').checked);
+  toast('Avtomatik təmizlik cədvəli saxlandı');
+}
+function loadSch(){
+  const s=J(N.getSch());
+  $('#son').checked=s.on;
+  $('#stime').value=String(s.h).padStart(2,'0')+':'+String(s.m).padStart(2,'0');
+  $('#sdays').value=s.d;
+  $('#snote').checked=s.n;
+}
+
+window.onShow=()=>{info();if($('#p-app').classList.contains('on'))loadApps();if($('#p-sys').classList.contains('on'))loadSys();};
+info();loadSch();
+</script></body></html>
